@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Building, DollarSign, FileText, ChartBar, Bell, X } from "lucide-react";
 import TransactionForm from "@/components/transactions/TransactionForm";
+import TransactionList from "@/components/transactions/TransactionList";
 
 const Index = () => {
   const [showTransactionForm, setShowTransactionForm] = useState(false);
@@ -85,6 +86,11 @@ const Index = () => {
                 </div>
               </Card>
             </div>
+
+            {/* Transactions Section */}
+            <section className="mb-8">
+              <TransactionList />
+            </section>
 
             {/* Recent Activity */}
             <section className="mb-8">
