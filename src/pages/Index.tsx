@@ -2,9 +2,37 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building, DollarSign, FileText, ChartBar, Bell, X } from "lucide-react";
+import {
+  Building,
+  DollarSign,
+  FileText,
+  ChartBar,
+  Bell,
+  X,
+  CalendarDays,
+  Users,
+  CheckCircle,
+  Clock,
+  TrendingUp
+} from "lucide-react";
 import TransactionForm from "@/components/transactions/TransactionForm";
 import TransactionList from "@/components/transactions/TransactionList";
+
+// Mock data for demonstration
+const upcomingAppointments = [
+  { id: 1, title: "Property Viewing", client: "John Smith", property: "123 Main St", time: "2:00 PM Today" },
+  { id: 2, title: "Contract Signing", client: "Sarah Johnson", property: "456 Oak Ave", time: "10:00 AM Tomorrow" },
+];
+
+const followUpReminders = [
+  { id: 1, client: "Mike Brown", task: "Follow up on offer", dueDate: "Today" },
+  { id: 2, client: "Lisa Davis", task: "Send property documents", dueDate: "Tomorrow" },
+];
+
+const recentTasks = [
+  { id: 1, title: "Update listing photos", status: "pending", dueDate: "Today" },
+  { id: 2, title: "Client feedback call", status: "completed", dueDate: "Yesterday" },
+];
 
 const Index = () => {
   const [showTransactionForm, setShowTransactionForm] = useState(false);
@@ -44,13 +72,14 @@ const Index = () => {
           </div>
         ) : (
           <>
-            {/* Quick Stats */}
+            {/* Enhanced Performance Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <Card className="p-6 glass-card animate-fadeIn">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Active Listings</p>
                     <h3 className="text-2xl font-semibold mt-2">24</h3>
+                    <p className="text-sm text-green-600 mt-1">↑ 4 from last month</p>
                   </div>
                   <Building className="h-5 w-5 text-primary" />
                 </div>
@@ -59,8 +88,9 @@ const Index = () => {
               <Card className="p-6 glass-card animate-fadeIn animation-delay-100">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Monthly Earnings</p>
+                    <p className="text-sm font-medium text-muted-foreground">Monthly Commission</p>
                     <h3 className="text-2xl font-semibold mt-2">$45,850</h3>
+                    <p className="text-sm text-green-600 mt-1">↑ 12% from last month</p>
                   </div>
                   <DollarSign className="h-5 w-5 text-primary" />
                 </div>
@@ -69,10 +99,11 @@ const Index = () => {
               <Card className="p-6 glass-card animate-fadeIn animation-delay-200">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Pending Transactions</p>
-                    <h3 className="text-2xl font-semibold mt-2">8</h3>
+                    <p className="text-sm font-medium text-muted-foreground">Client Base</p>
+                    <h3 className="text-2xl font-semibold mt-2">156</h3>
+                    <p className="text-sm text-green-600 mt-1">↑ 8 new this month</p>
                   </div>
-                  <FileText className="h-5 w-5 text-primary" />
+                  <Users className="h-5 w-5 text-primary" />
                 </div>
               </Card>
               
@@ -81,79 +112,87 @@ const Index = () => {
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Conversion Rate</p>
                     <h3 className="text-2xl font-semibold mt-2">68%</h3>
+                    <p className="text-sm text-green-600 mt-1">↑ 5% from last month</p>
                   </div>
-                  <ChartBar className="h-5 w-5 text-primary" />
+                  <TrendingUp className="h-5 w-5 text-primary" />
                 </div>
               </Card>
             </div>
+
+            {/* Appointments and Reminders Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              {/* Upcoming Appointments */}
+              <Card className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold">Upcoming Appointments</h2>
+                  <CalendarDays className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <div className="space-y-4">
+                  {upcomingAppointments.map((appointment) => (
+                    <div key={appointment.id} className="flex items-start justify-between p-3 bg-muted/50 rounded-lg">
+                      <div>
+                        <h3 className="font-medium">{appointment.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {appointment.client} - {appointment.property}
+                        </p>
+                      </div>
+                      <span className="text-sm font-medium">{appointment.time}</span>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+
+              {/* Follow-up Reminders */}
+              <Card className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold">Follow-up Reminders</h2>
+                  <Clock className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <div className="space-y-4">
+                  {followUpReminders.map((reminder) => (
+                    <div key={reminder.id} className="flex items-start justify-between p-3 bg-muted/50 rounded-lg">
+                      <div>
+                        <h3 className="font-medium">{reminder.client}</h3>
+                        <p className="text-sm text-muted-foreground">{reminder.task}</p>
+                      </div>
+                      <span className="text-sm font-medium">{reminder.dueDate}</span>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
+
+            {/* Tasks Section */}
+            <section className="mb-8">
+              <Card className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold">Tasks</h2>
+                  <Button variant="outline" size="sm">+ Add Task</Button>
+                </div>
+                <div className="space-y-4">
+                  {recentTasks.map((task) => (
+                    <div key={task.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <CheckCircle className={`h-5 w-5 ${task.status === 'completed' ? 'text-green-500' : 'text-muted-foreground'}`} />
+                        <div>
+                          <h3 className="font-medium">{task.title}</h3>
+                          <p className="text-sm text-muted-foreground">Due: {task.dueDate}</p>
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="sm">Mark Complete</Button>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </section>
 
             {/* Transactions Section */}
             <section className="mb-8">
               <TransactionList />
             </section>
-
-            {/* Recent Activity */}
-            <section className="mb-8">
-              <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
-              <Card className="p-6 glass-card animate-slideUp">
-                <div className="space-y-4">
-                  <ActivityItem
-                    title="New Transaction"
-                    description="123 Main Street property transaction initiated"
-                    time="2 hours ago"
-                    status="pending"
-                  />
-                  <ActivityItem
-                    title="Commission Received"
-                    description="Commission payment for 456 Oak Avenue received"
-                    time="5 hours ago"
-                    status="success"
-                  />
-                  <ActivityItem
-                    title="Document Update"
-                    description="Additional documents requested for 789 Pine Street"
-                    time="1 day ago"
-                    status="warning"
-                  />
-                </div>
-              </Card>
-            </section>
           </>
         )}
       </main>
-    </div>
-  );
-};
-
-const ActivityItem = ({ 
-  title, 
-  description, 
-  time, 
-  status 
-}: { 
-  title: string; 
-  description: string; 
-  time: string; 
-  status: 'pending' | 'success' | 'warning';
-}) => {
-  const statusColors = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    success: 'bg-green-100 text-green-800',
-    warning: 'bg-red-100 text-red-800',
-  };
-
-  return (
-    <div className="flex items-start justify-between p-4 hover:bg-muted/50 rounded-lg transition-colors">
-      <div className="flex-1">
-        <h3 className="font-medium">{title}</h3>
-        <p className="text-sm text-muted-foreground mt-1">{description}</p>
-      </div>
-      <div className="flex flex-col items-end gap-2">
-        <span className="text-sm text-muted-foreground">{time}</span>
-        <span className={`text-xs px-2 py-1 rounded-full ${statusColors[status]}`}>
-          {status.charAt(0).toUpperCase() + status.slice(1)}
-        </span>
-      </div>
     </div>
   );
 };
