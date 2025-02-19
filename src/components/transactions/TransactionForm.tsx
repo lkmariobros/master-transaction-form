@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { FileUp } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -27,16 +27,111 @@ const TransactionForm = ({ onClose, marketType }: TransactionFormProps) => {
   const [showAdditionalFields, setShowAdditionalFields] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "loan">("cash");
   const [buyerType, setBuyerType] = useState<"individual" | "company">("individual");
+  const [formData, setFormData] = useState({
+    developerPrice: '',
+    premiums: '',
+    developerRebate: '',
+    loanMarkup: '',
+    listingPrice: '',
+    transactionPrice: '',
+    nettPrice: '',
+    commissionRate: '',
+    commissionAmount: ''
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Implement form submission
-    onClose();
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  useEffect(() => {
+    validatePrices();
+    calculateCommission();
+  }, [formData]);
+
+  const validatePrices = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (marketType === "primary") {
+      const basePrice = Number(formData.developerPrice) || 0;
+      const premiums = Number(formData.premiums) || 0;
+      const rebates = Number(formData.developerRebate) || 0;
+      const markup = Number(formData.loanMarkup) || 0;
+      const transactionPrice = Number(formData.transactionPrice) || 0;
+      const nettPrice = Number(formData.nettPrice) || 0;
+
+      // Developer price must be positive
+      if (basePrice <= 0 && formData.developerPrice !== '') {
+        newErrors.developerPrice = 'Base price must be greater than 0';
+      }
+
+      // Transaction price validation
+      const expectedTransaction = basePrice + premiums - rebates + markup;
+      if (Math.abs(transactionPrice - expectedTransaction) > 1 && formData.transactionPrice !== '') {
+        newErrors.transactionPrice = 'Transaction price should match total calculation';
+      }
+
+      // Nett price validation
+      if (nettPrice > transactionPrice && formData.nettPrice !== '') {
+        newErrors.nettPrice = 'Nett price cannot exceed transaction price';
+      }
+      if (nettPrice < basePrice && formData.nettPrice !== '') {
+        newErrors.nettPrice = 'Nett price should not be less than base price';
+      }
+    } else {
+      // Secondary market validations
+      const listingPrice = Number(formData.listingPrice) || 0;
+      const transactionPrice = Number(formData.transactionPrice) || 0;
+      const nettPrice = Number(formData.nettPrice) || 0;
+
+      if (listingPrice <= 0 && formData.listingPrice !== '') {
+        newErrors.listingPrice = 'Listing price must be greater than 0';
+      }
+
+      if (transactionPrice <= 0 && formData.transactionPrice !== '') {
+        newErrors.transactionPrice = 'Transaction price must be greater than 0';
+      }
+
+      if (nettPrice > transactionPrice && formData.nettPrice !== '') {
+        newErrors.nettPrice = 'Nett price cannot exceed transaction price';
+      }
+    }
+
+    // Commission validations
+    const commissionRate = Number(formData.commissionRate) || 0;
+    if (commissionRate <= 0 && formData.commissionRate !== '') {
+      newErrors.commissionRate = 'Commission rate must be greater than 0';
+    }
+    if (commissionRate > 100) {
+      newErrors.commissionRate = 'Commission rate cannot exceed 100%';
+    }
+
+    setErrors(newErrors);
+  };
+
+  const calculateCommission = () => {
+    const nettPrice = Number(formData.nettPrice) || 0;
+    const commissionRate = Number(formData.commissionRate) || 0;
+    
+    if (nettPrice > 0 && commissionRate > 0) {
+      const commission = (nettPrice * commissionRate) / 100;
+      setFormData(prev => ({ ...prev, commissionAmount: commission.toString() }));
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setFiles(Array.from(e.target.files));
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (Object.keys(errors).length === 0) {
+      // TODO: Submit form
+      onClose();
     }
   };
 
