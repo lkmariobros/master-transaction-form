@@ -28,10 +28,6 @@ const TransactionForm = ({ onClose, marketType }: TransactionFormProps) => {
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "loan">("cash");
   const [buyerType, setBuyerType] = useState<"individual" | "company">("individual");
   const [formData, setFormData] = useState({
-    developerPrice: '',
-    premiums: '',
-    developerRebate: '',
-    loanMarkup: '',
     listingPrice: '',
     transactionPrice: '',
     nettPrice: '',
@@ -54,58 +50,21 @@ const TransactionForm = ({ onClose, marketType }: TransactionFormProps) => {
   const validatePrices = () => {
     const newErrors: Record<string, string> = {};
     
-    if (marketType === "primary") {
-      const basePrice = Number(formData.developerPrice) || 0;
-      const premiums = Number(formData.premiums) || 0;
-      const rebates = Number(formData.developerRebate) || 0;
-      const markup = Number(formData.loanMarkup) || 0;
-      const transactionPrice = Number(formData.transactionPrice) || 0;
-      const nettPrice = Number(formData.nettPrice) || 0;
-
-      // Developer price must be positive
-      if (basePrice <= 0 && formData.developerPrice !== '') {
-        newErrors.developerPrice = 'Base price must be greater than 0';
-      }
-
-      // Transaction price validation
-      const expectedTransaction = basePrice + premiums - rebates + markup;
-      if (Math.abs(transactionPrice - expectedTransaction) > 1 && formData.transactionPrice !== '') {
-        newErrors.transactionPrice = 'Transaction price should match total calculation';
-      }
-
-      // Nett price validation
-      if (nettPrice > transactionPrice && formData.nettPrice !== '') {
-        newErrors.nettPrice = 'Nett price cannot exceed transaction price';
-      }
-      if (nettPrice < basePrice && formData.nettPrice !== '') {
-        newErrors.nettPrice = 'Nett price should not be less than base price';
-      }
-    } else {
-      // Secondary market validations
-      const listingPrice = Number(formData.listingPrice) || 0;
-      const transactionPrice = Number(formData.transactionPrice) || 0;
-      const nettPrice = Number(formData.nettPrice) || 0;
-
-      if (listingPrice <= 0 && formData.listingPrice !== '') {
-        newErrors.listingPrice = 'Listing price must be greater than 0';
-      }
-
-      if (transactionPrice <= 0 && formData.transactionPrice !== '') {
-        newErrors.transactionPrice = 'Transaction price must be greater than 0';
-      }
-
-      if (nettPrice > transactionPrice && formData.nettPrice !== '') {
-        newErrors.nettPrice = 'Nett price cannot exceed transaction price';
-      }
-    }
-
-    // Commission validations
+    const transactionPrice = Number(formData.transactionPrice) || 0;
+    const nettPrice = Number(formData.nettPrice) || 0;
     const commissionRate = Number(formData.commissionRate) || 0;
-    if (commissionRate <= 0 && formData.commissionRate !== '') {
-      newErrors.commissionRate = 'Commission rate must be greater than 0';
+
+    // Basic validation
+    if (transactionPrice <= 0 && formData.transactionPrice !== '') {
+      newErrors.transactionPrice = 'Transaction price must be greater than 0';
     }
-    if (commissionRate > 100) {
-      newErrors.commissionRate = 'Commission rate cannot exceed 100%';
+
+    if (nettPrice > transactionPrice && formData.nettPrice !== '') {
+      newErrors.nettPrice = 'Nett price cannot exceed transaction price';
+    }
+
+    if (commissionRate > 100 || (commissionRate <= 0 && formData.commissionRate !== '')) {
+      newErrors.commissionRate = 'Commission rate must be between 0 and 100%';
     }
 
     setErrors(newErrors);
