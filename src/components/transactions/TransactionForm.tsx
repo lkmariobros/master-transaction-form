@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +26,7 @@ const TransactionForm = ({ onClose }: TransactionFormProps) => {
   const [showAdditionalFields, setShowAdditionalFields] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "loan">("cash");
   const [buyerType, setBuyerType] = useState<"individual" | "company">("individual");
+  const [isSecondaryMarket, setIsSecondaryMarket] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,23 +49,58 @@ const TransactionForm = ({ onClose }: TransactionFormProps) => {
           {/* Basic Project Details */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Project Details</h3>
+            
+            {/* Market Type Selection */}
+            <div className="space-y-2">
+              <Label>Market Type</Label>
+              <RadioGroup 
+                defaultValue="primary" 
+                onValueChange={(value) => setIsSecondaryMarket(value === "secondary")}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="primary" id="primary" />
+                  <Label htmlFor="primary">Primary Market (Developer Projects)</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="secondary" id="secondary" />
+                  <Label htmlFor="secondary">Secondary Market (Individual Property)</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="projectName">Project Name</Label>
-                <Input id="projectName" placeholder="Enter project name" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="projectType">Project Type</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select project type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="primary">Primary</SelectItem>
-                    <SelectItem value="secondary">Secondary</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {!isSecondaryMarket ? (
+                <>
+                  {/* Primary Market Fields */}
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="projectSearch">Search Project</Label>
+                    <div className="relative">
+                      <Input
+                        id="projectSearch"
+                        placeholder="Type to search developer projects..."
+                        className="w-full"
+                      />
+                      {/* TODO: Implement project search results dropdown */}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Search for developer projects by name, location, or developer
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Secondary Market Fields */}
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="propertyAddress">Property Address</Label>
+                    <Textarea 
+                      id="propertyAddress" 
+                      placeholder="Enter complete property address"
+                      required={isSecondaryMarket}
+                    />
+                  </div>
+                </>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="propertyCategory">Property Category</Label>
                 <Select>
@@ -79,6 +114,7 @@ const TransactionForm = ({ onClose }: TransactionFormProps) => {
                   </SelectContent>
                 </Select>
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="propertySubType">Property Sub-Type</Label>
                 <Select>
