@@ -6,6 +6,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { FileUp } from "lucide-react";
 import { useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface TransactionFormProps {
   onClose: () => void;
@@ -13,6 +24,9 @@ interface TransactionFormProps {
 
 const TransactionForm = ({ onClose }: TransactionFormProps) => {
   const [files, setFiles] = useState<File[]>([]);
+  const [showAdditionalFields, setShowAdditionalFields] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"cash" | "loan">("cash");
+  const [buyerType, setBuyerType] = useState<"individual" | "company">("individual");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,53 +41,180 @@ const TransactionForm = ({ onClose }: TransactionFormProps) => {
   };
 
   return (
-    <Card className="p-6 max-w-2xl mx-auto">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="space-y-4">
+    <Card className="p-6 max-w-4xl mx-auto">
+      <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="space-y-6">
           <h2 className="text-2xl font-semibold">New Transaction</h2>
           
-          {/* Property Details */}
+          {/* Basic Project Details */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Property Details</h3>
+            <h3 className="text-lg font-medium">Project Details</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="propertyAddress">Property Address</Label>
-                <Input id="propertyAddress" placeholder="Enter property address" required />
+                <Label htmlFor="projectName">Project Name</Label>
+                <Input id="projectName" placeholder="Enter project name" required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="propertyType">Property Type</Label>
-                <Input id="propertyType" placeholder="e.g., Residential, Commercial" required />
+                <Label htmlFor="projectType">Project Type</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select project type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="primary">Primary</SelectItem>
+                    <SelectItem value="secondary">Secondary</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="propertyCategory">Property Category</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="residential">Residential</SelectItem>
+                    <SelectItem value="commercial">Commercial</SelectItem>
+                    <SelectItem value="land">Land</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="propertySubType">Property Sub-Type</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select sub-type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="condo">Condo</SelectItem>
+                    <SelectItem value="terrace">Terrace</SelectItem>
+                    <SelectItem value="semi-d">Semi-D</SelectItem>
+                    <SelectItem value="bungalow">Bungalow</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {/* Transaction Details */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Transaction Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="listingPrice">Listing Price</Label>
                 <Input id="listingPrice" type="number" placeholder="Enter amount" required />
               </div>
               <div className="space-y-2">
+                <Label htmlFor="transactionPrice">Transaction Price</Label>
+                <Input id="transactionPrice" type="number" placeholder="Enter amount" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="nettPrice">Nett Price</Label>
+                <Input id="nettPrice" type="number" placeholder="Enter amount" />
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="commissionRate">Commission Rate (%)</Label>
                 <Input id="commissionRate" type="number" step="0.1" placeholder="Enter percentage" required />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="commissionSplit">Commission Split (%)</Label>
+                <Input id="commissionSplit" type="number" step="0.1" placeholder="If co-broke" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="paymentMethod">Payment Method</Label>
+                <RadioGroup value={paymentMethod} onValueChange={(value: "cash" | "loan") => setPaymentMethod(value)}>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="cash" id="cash" />
+                    <Label htmlFor="cash">Cash</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="loan" id="loan" />
+                    <Label htmlFor="loan">Loan</Label>
+                  </div>
+                </RadioGroup>
+              </div>
             </div>
+            
+            {paymentMethod === "loan" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="bankName">Bank Name</Label>
+                  <Input id="bankName" placeholder="Enter bank name" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="loanAmount">Loan Amount</Label>
+                  <Input id="loanAmount" type="number" placeholder="Enter loan amount" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="loanStatus">Loan Status</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="approved">Approved</SelectItem>
+                      <SelectItem value="rejected">Rejected</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Buyer Details */}
+          {/* Buyer Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Buyer Details</h3>
+            <h3 className="text-lg font-medium">Buyer Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="buyerName">Buyer Name</Label>
-                <Input id="buyerName" placeholder="Enter buyer's full name" required />
+                <Input id="buyerName" placeholder="Enter buyer's name" required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="buyerEmail">Buyer Email</Label>
-                <Input id="buyerEmail" type="email" placeholder="Enter buyer's email" required />
+                <Label htmlFor="buyerType">Buyer Type</Label>
+                <RadioGroup value={buyerType} onValueChange={(value: "individual" | "company") => setBuyerType(value)}>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="individual" id="individual" />
+                    <Label htmlFor="individual">Individual</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="company" id="company" />
+                    <Label htmlFor="company">Company</Label>
+                  </div>
+                </RadioGroup>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="buyerPhone">Buyer Phone</Label>
-                <Input id="buyerPhone" placeholder="Enter buyer's phone number" required />
+                <Label htmlFor="buyerEmail">Email (Optional)</Label>
+                <Input id="buyerEmail" type="email" placeholder="Enter buyer's email" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="buyerNotes">Additional Notes</Label>
-                <Textarea id="buyerNotes" placeholder="Enter any additional notes" />
+                <Label htmlFor="buyerPhone">Phone (Optional)</Label>
+                <Input id="buyerPhone" placeholder="Enter buyer's phone" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="clientSource">Source of Client</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select source" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="direct">Direct</SelectItem>
+                    <SelectItem value="referral">Referral</SelectItem>
+                    <SelectItem value="portal">Portal</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="buyingPurpose">Buying Purpose</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select purpose" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ownStay">Own Stay</SelectItem>
+                    <SelectItem value="investment">Investment</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
@@ -95,7 +236,7 @@ const TransactionForm = ({ onClose }: TransactionFormProps) => {
               >
                 <FileUp className="h-8 w-8 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">
-                  Click to upload documents
+                  Upload required documents (Booking Form, ID Copy, etc.)
                 </span>
               </label>
               {files.length > 0 && (
@@ -105,6 +246,44 @@ const TransactionForm = ({ onClose }: TransactionFormProps) => {
               )}
             </div>
           </div>
+
+          {/* Show More Details Button */}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowAdditionalFields(!showAdditionalFields)}
+          >
+            {showAdditionalFields ? "Hide Additional Details" : "Show Additional Details"}
+          </Button>
+
+          {/* Additional Details (Optional) */}
+          {showAdditionalFields && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Additional Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="coAgentDetails">Co-Agent Details</Label>
+                  <Textarea id="coAgentDetails" placeholder="Enter co-agent details if any" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="specialRemarks">Special Remarks</Label>
+                  <Textarea id="specialRemarks" placeholder="Enter any special remarks" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="followUpTasks">Follow-up Tasks</Label>
+                  <Textarea id="followUpTasks" placeholder="Enter follow-up tasks" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="saleConditions">Special Conditions of Sale</Label>
+                  <Textarea id="saleConditions" placeholder="Enter special conditions" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="incentives">Incentives/Rebates</Label>
+                  <Textarea id="incentives" placeholder="Enter incentives if any" />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end gap-4">
