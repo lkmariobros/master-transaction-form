@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,8 +16,14 @@ import {
 } from "lucide-react";
 import TransactionForm from "@/components/transactions/TransactionForm";
 import TransactionList from "@/components/transactions/TransactionList";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
-// Mock data for demonstration
 const upcomingAppointments = [
   { id: 1, title: "Property Viewing", client: "John Smith", property: "123 Main St", time: "2:00 PM Today" },
   { id: 2, title: "Contract Signing", client: "Sarah Johnson", property: "456 Oak Ave", time: "10:00 AM Tomorrow" },
@@ -36,6 +41,18 @@ const recentTasks = [
 
 const Index = () => {
   const [showTransactionForm, setShowTransactionForm] = useState(false);
+  const [showMarketTypeDialog, setShowMarketTypeDialog] = useState(false);
+  const [selectedMarketType, setSelectedMarketType] = useState<"primary" | "secondary" | null>(null);
+
+  const handleNewTransaction = () => {
+    setShowMarketTypeDialog(true);
+  };
+
+  const handleMarketTypeSelect = (type: "primary" | "secondary") => {
+    setSelectedMarketType(type);
+    setShowMarketTypeDialog(false);
+    setShowTransactionForm(true);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -47,12 +64,48 @@ const Index = () => {
             <Button variant="ghost" size="icon">
               <Bell className="h-5 w-5" />
             </Button>
-            <Button onClick={() => setShowTransactionForm(true)}>
+            <Button onClick={handleNewTransaction}>
               New Transaction
             </Button>
           </div>
         </div>
       </header>
+
+      {/* Market Type Selection Dialog */}
+      <Dialog open={showMarketTypeDialog} onOpenChange={setShowMarketTypeDialog}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Select Market Type</DialogTitle>
+            <DialogDescription>
+              Choose the type of property transaction you want to create
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-1 gap-4 py-4">
+            <Button
+              variant="outline"
+              className="h-24 flex flex-col items-center justify-center gap-2"
+              onClick={() => handleMarketTypeSelect("primary")}
+            >
+              <Building className="h-8 w-8" />
+              <div>
+                <p className="font-semibold">Primary Market</p>
+                <p className="text-sm text-muted-foreground">Developer Projects</p>
+              </div>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-24 flex flex-col items-center justify-center gap-2"
+              onClick={() => handleMarketTypeSelect("secondary")}
+            >
+              <FileText className="h-8 w-8" />
+              <div>
+                <p className="font-semibold">Secondary Market</p>
+                <p className="text-sm text-muted-foreground">Individual Property</p>
+              </div>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
@@ -63,11 +116,20 @@ const Index = () => {
                 variant="ghost"
                 size="icon"
                 className="absolute top-4 right-4"
-                onClick={() => setShowTransactionForm(false)}
+                onClick={() => {
+                  setShowTransactionForm(false);
+                  setSelectedMarketType(null);
+                }}
               >
                 <X className="h-5 w-5" />
               </Button>
-              <TransactionForm onClose={() => setShowTransactionForm(false)} />
+              <TransactionForm 
+                onClose={() => {
+                  setShowTransactionForm(false);
+                  setSelectedMarketType(null);
+                }}
+                marketType={selectedMarketType!}
+              />
             </div>
           </div>
         ) : (

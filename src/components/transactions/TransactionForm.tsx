@@ -19,14 +19,14 @@ import {
 
 interface TransactionFormProps {
   onClose: () => void;
+  marketType: "primary" | "secondary";
 }
 
-const TransactionForm = ({ onClose }: TransactionFormProps) => {
+const TransactionForm = ({ onClose, marketType }: TransactionFormProps) => {
   const [files, setFiles] = useState<File[]>([]);
   const [showAdditionalFields, setShowAdditionalFields] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "loan">("cash");
   const [buyerType, setBuyerType] = useState<"individual" | "company">("individual");
-  const [isSecondaryMarket, setIsSecondaryMarket] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,32 +44,15 @@ const TransactionForm = ({ onClose }: TransactionFormProps) => {
     <Card className="p-6 max-w-4xl mx-auto">
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="space-y-6">
-          <h2 className="text-2xl font-semibold">New Transaction</h2>
+          <h2 className="text-2xl font-semibold">
+            New {marketType === "primary" ? "Developer Project" : "Individual Property"} Transaction
+          </h2>
           
           {/* Basic Project Details */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Project Details</h3>
-            
-            {/* Market Type Selection */}
-            <div className="space-y-2">
-              <Label>Market Type</Label>
-              <RadioGroup 
-                defaultValue="primary" 
-                onValueChange={(value) => setIsSecondaryMarket(value === "secondary")}
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="primary" id="primary" />
-                  <Label htmlFor="primary">Primary Market (Developer Projects)</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="secondary" id="secondary" />
-                  <Label htmlFor="secondary">Secondary Market (Individual Property)</Label>
-                </div>
-              </RadioGroup>
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {!isSecondaryMarket ? (
+              {marketType === "primary" ? (
                 <>
                   {/* Primary Market Fields */}
                   <div className="space-y-2 md:col-span-2">
@@ -95,7 +78,7 @@ const TransactionForm = ({ onClose }: TransactionFormProps) => {
                     <Textarea 
                       id="propertyAddress" 
                       placeholder="Enter complete property address"
-                      required={isSecondaryMarket}
+                      required
                     />
                   </div>
                 </>
